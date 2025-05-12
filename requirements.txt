@@ -2,7 +2,7 @@
 django==3.1.7
 asgiref==3.3.1
 djangorestframework==3.12.4
-pytz==2021.1
+pytz==2021.3  # Updated to satisfy Celery requirement
 sqlparse==0.4.1
 certifi==2020.12.5
 chardet==4.0.0
@@ -15,3 +15,6 @@ json-tricks==3.16.1  # For better JSON serialization
 gunicorn==20.1.0  # WSGI HTTP Server for UNIX
 celery==5.2.7  # For asynchronous task processing
 django-celery-results==2.4.0  # For storing Celery results in Django ORM
+kombu>=5.2.3,<6.0  # Required by Celery
+billiard>=3.6.4.0,<4.0  # Required by Celery
+vine>=5.0.0,<6.0  # Required by Celery
