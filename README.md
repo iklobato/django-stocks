@@ -69,14 +69,26 @@ For simplicity, both services will share the same dependencies (requirements.txt
 ## Architecture
 ![Architecture Diagram](diagram.svg)
 1. A user makes a request asking for Apple's current Stock quote: `GET /stock?q=aapl.us`
-2. The API service communicates with the stock service through RabbitMQ (or HTTP as fallback) to retrieve the requested stock information
-3. The stock service delegates the call to the external API, parses the response, and returns the information back to the API service.
-4. The API service saves the response from the stock service in the database.
-5. The data is formatted and returned to the user.
+2. The API service sends a message to the RabbitMQ Service to retrieve the requested stock information
+3. The RabbitMQ Service forwards the request to the Stock Service
+4. The Stock Service calls the external API (stooq.com), parses the response, and returns the information
+5. The RabbitMQ Service forwards the response back to the API Service
+6. The API service saves the response in the database and returns it to the user
+
+## Microservices Architecture
+The project is split into four microservices:
+
+1. **API Service**: Handles user authentication and stock queries
+2. **RabbitMQ Service**: Manages message queue communication between services
+3. **Stock Service**: Fetches stock data from external API
+4. **RabbitMQ Broker**: Provides the message queue infrastructure
+
+Each service has its own responsibility and can be scaled independently.
 
 ## Implemented Bonuses
-* **RabbitMQ Integration**: The services now communicate via RabbitMQ using the Remote Procedure Call (RPC) pattern, with HTTP fallback for reliability.
+* **RabbitMQ Integration**: The services communicate via RabbitMQ using the Remote Procedure Call (RPC) pattern.
 * **Unit Tests**: Tests for the stock service and RabbitMQ integration are included.
+* **Microservices Architecture**: The application is built with a true microservices architecture, with each service having a single responsibility.
 
 ## Additional Bonuses (Not Implemented)
 * Use JWT instead of basic authentication for endpoints.
@@ -85,14 +97,16 @@ For simplicity, both services will share the same dependencies (requirements.txt
 The project now includes RabbitMQ integration for communication between services:
 
 * See [RABBITMQ_SETUP.md](RABBITMQ_SETUP.md) for detailed instructions on setting up and using RabbitMQ.
-* A Docker Compose file is provided to run RabbitMQ locally.
-* The API service uses RabbitMQ to communicate with the stock service, with fallback to HTTP if RabbitMQ fails.
+* The RabbitMQ Service acts as a dedicated microservice for handling message queue communication.
+* The API service communicates with the Stock service through the RabbitMQ Service, with fallback to direct HTTP if needed.
 
 ## How to run the project
 
-This project consists of two separate Django applications that communicate via RabbitMQ:
+This project consists of four microservices:
 1. **api_service** - The main API service that handles user authentication and stock queries
 2. **stock_service** - The internal service that fetches stock data from external API
+3. **rabbitmq_service** - A dedicated service for handling message queue communication
+4. **rabbitmq** - The RabbitMQ message broker
 
 ### Running with Docker Compose (recommended)
 

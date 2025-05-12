@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -10,14 +11,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'b!+q)h#vk3lz+lep2@d5=t*m7$grwtkl_(k-f9bt@75k-=omn4'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'b!+q)h#vk3lz+lep2@d5=t*m7$grwtkl_(k-f9bt@75k-=omn4')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-APPEND_SLASH = False
+# Allow both with and without trailing slashes
+APPEND_SLASH = True
 
-ALLOWED_HOSTS = []
+# Parse allowed hosts from environment variable
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -118,3 +121,14 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
 }
+
+# RabbitMQ Settings
+RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
+RABBITMQ_PORT = int(os.environ.get('RABBITMQ_PORT', 5672))
+RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'guest')
+RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'guest')
+RABBITMQ_STOCK_QUEUE = os.environ.get('RABBITMQ_STOCK_QUEUE', 'stock_queue')
+RABBITMQ_TIMEOUT = int(os.environ.get('RABBITMQ_TIMEOUT', 10))  # seconds
+
+# Stock Service URL for fallback
+STOCK_SERVICE_URL = os.environ.get('STOCK_SERVICE_URL', 'http://localhost:8001')

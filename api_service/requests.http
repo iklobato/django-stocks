@@ -1,0 +1,155 @@
+### API Service Endpoints
+### Use with REST Client extension in VS Code or JetBrains IDEs
+
+### Variables
+@baseUrl = http://localhost:8000
+@username = testuser
+@password = testpass123
+@adminUsername = admin
+@adminPassword = admin123
+
+#################################
+### DOCUMENTATION ###############
+#################################
+
+### API Root Documentation
+GET {{baseUrl}}/
+Accept: application/json
+
+#################################
+### AUTHENTICATION ##############
+#################################
+
+### Basic authentication credentials
+# @name basicAuth
+@base64Auth = {{username}}:{{password}}
+@adminBase64Auth = {{adminUsername}}:{{adminPassword}}
+
+#################################
+### STOCK DATA ENDPOINTS ########
+#################################
+
+### Get stock data with trailing slash 
+GET {{baseUrl}}/stock/?q=aapl.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+### Get stock data without trailing slash
+GET {{baseUrl}}/stock?q=aapl.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+### Test various stock symbols
+
+# Apple
+GET {{baseUrl}}/stock?q=aapl.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Microsoft
+GET {{baseUrl}}/stock?q=msft.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Google
+GET {{baseUrl}}/stock?q=goog.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Amazon
+GET {{baseUrl}}/stock?q=amzn.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Tesla
+GET {{baseUrl}}/stock?q=tsla.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Netflix
+GET {{baseUrl}}/stock?q=nflx.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+#################################
+### HISTORY & STATS ENDPOINTS ###
+#################################
+
+### Get history with trailing slash
+GET {{baseUrl}}/history/
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+### Get history without trailing slash
+GET {{baseUrl}}/history
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+### Get stats with trailing slash (admin only)
+GET {{baseUrl}}/stats/
+Accept: application/json
+Authorization: Basic {{adminBase64Auth}}
+
+### Get stats without trailing slash (admin only)
+GET {{baseUrl}}/stats
+Accept: application/json
+Authorization: Basic {{adminBase64Auth}}
+
+#################################
+### ERROR CASE TESTING ##########
+#################################
+
+# Invalid stock symbol
+GET {{baseUrl}}/stock?q=invalid
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Missing parameter (should return 400 Bad Request)
+GET {{baseUrl}}/stock
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+# Unauthorized request (should return 401 Unauthorized)
+GET {{baseUrl}}/stock?q=aapl.us
+Accept: application/json
+
+# Access admin endpoint as regular user (should return 403 Forbidden)
+GET {{baseUrl}}/stats
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+#################################
+### ADMIN INTERFACE #############
+#################################
+
+### Admin panel login
+GET {{baseUrl}}/admin/
+Accept: text/html
+
+#################################
+### PERFORMANCE TESTING #########
+#################################
+
+### Make multiple sequential requests to build history
+# Request 1
+GET {{baseUrl}}/stock?q=aapl.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+###
+# Request 2
+GET {{baseUrl}}/stock?q=msft.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+###
+# Request 3
+GET {{baseUrl}}/stock?q=goog.us
+Accept: application/json
+Authorization: Basic {{base64Auth}}
+
+###
+# Check history after multiple requests
+GET {{baseUrl}}/history
+Accept: application/json
+Authorization: Basic {{base64Auth}}
