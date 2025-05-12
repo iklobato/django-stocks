@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_celery_results',
     'api'
 ]
 
@@ -100,3 +101,12 @@ RABBITMQ_STOCK_QUEUE = os.environ.get('RABBITMQ_STOCK_QUEUE', 'stock_queue')
 RABBITMQ_TIMEOUT = int(os.environ.get('RABBITMQ_TIMEOUT', 10))
 
 STOCK_SERVICE_URL = os.environ.get('STOCK_SERVICE_URL', 'http://localhost:8001')
+
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost//')
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE

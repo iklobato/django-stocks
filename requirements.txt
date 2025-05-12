@@ -13,3 +13,5 @@ setuptools>=59.0.0
 pika==1.2.0  # RabbitMQ client
 json-tricks==3.16.1  # For better JSON serialization
 gunicorn==20.1.0  # WSGI HTTP Server for UNIX
+celery==5.2.7  # For asynchronous task processing
+django-celery-results==2.4.0  # For storing Celery results in Django ORM
