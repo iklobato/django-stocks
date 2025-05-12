@@ -1,0 +1,167 @@
+version = 1
+revision = 1
+requires-python = ">=3.8"
+
+[[package]]
+name = "asgiref"
+version = "3.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e9/d1/096b5b0b411a1a53c294a508fdc51542de77bc193df5c8230ff9445e4ff3/asgiref-3.3.1.tar.gz", hash = "sha256:7162a3cb30ab0609f1a4c95938fd73e8604f63bdba516a7f7d64b83ff09478f0", size = 27197 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/89/49/5531992efc62f9c6d08a7199dc31176c8c60f7b2548c6ef245f96f29d0d9/asgiref-3.3.1-py3-none-any.whl", hash = "sha256:5ee950735509d04eb673bd7f7120f8fa1c9e2df495394992c73234d526907e17", size = 19983 },
+]
+
+[[package]]
+name = "certifi"
+version = "2020.12.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/06/a9/cd1fd8ee13f73a4d4f491ee219deeeae20afefa914dfb4c130cfc9dc397a/certifi-2020.12.5.tar.gz", hash = "sha256:1a4995114262bffbc2413b159f2a1a480c969de6e6eb13ee966d470af86af59c", size = 149468 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5e/a0/5f06e1e1d463903cf0c0eebeb751791119ed7a4b3737fdc9a77f1cdfb51f/certifi-2020.12.5-py2.py3-none-any.whl", hash = "sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830", size = 147526 },
+]
+
+[[package]]
+name = "chardet"
+version = "4.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ee/2d/9cdc2b527e127b4c9db64b86647d567985940ac3698eeabc7ffaccb4ea61/chardet-4.0.0.tar.gz", hash = "sha256:0d6f53a15db4120f2b08c94f11e7d93d2c911ee118b6b30a04ec3ee8310179fa", size = 1907771 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/c7/fa589626997dd07bd87d9269342ccb74b1720384a4d739a1872bd84fbe68/chardet-4.0.0-py2.py3-none-any.whl", hash = "sha256:f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5", size = 178743 },
+]
+
+[[package]]
+name = "django"
+version = "3.1.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "pytz" },
+    { name = "sqlparse" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c2/b8/5fcb2fdfe015fbea62c728255b09887dd71ba09e90cfe996461f3bf63cfe/Django-3.1.7.tar.gz", hash = "sha256:32ce792ee9b6a0cbbec340123e229ac9f765dff8c2a4ae9247a14b2ba3a365a7", size = 9673009 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/6f/9a4415cc4fe9228e26ea53cf2005961799b2abb8da0411e519fdb74754fa/Django-3.1.7-py3-none-any.whl", hash = "sha256:baf099db36ad31f970775d0be5587cc58a6256a6771a44eb795b554d45f211b8", size = 7834206 },
+]
+
+[[package]]
+name = "django-challenge"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "asgiref" },
+    { name = "django" },
+    { name = "djangorestframework" },
+    { name = "pytz" },
+    { name = "sqlparse" },
+]
+
+[package.optional-dependencies]
+api = [
+    { name = "certifi" },
+    { name = "chardet" },
+    { name = "idna" },
+    { name = "requests" },
+    { name = "urllib3" },
+]
+common = [
+    { name = "asgiref" },
+    { name = "django" },
+    { name = "djangorestframework" },
+    { name = "pytz" },
+    { name = "sqlparse" },
+]
+stock = [
+    { name = "certifi" },
+    { name = "chardet" },
+    { name = "idna" },
+    { name = "requests" },
+    { name = "urllib3" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "asgiref", specifier = "==3.3.1" },
+    { name = "asgiref", marker = "extra == 'common'", specifier = "==3.3.1" },
+    { name = "certifi", marker = "extra == 'api'", specifier = "==2020.12.5" },
+    { name = "certifi", marker = "extra == 'stock'", specifier = "==2020.12.5" },
+    { name = "chardet", marker = "extra == 'api'", specifier = "==4.0.0" },
+    { name = "chardet", marker = "extra == 'stock'", specifier = "==4.0.0" },
+    { name = "django", specifier = "==3.1.7" },
+    { name = "django", marker = "extra == 'common'", specifier = "==3.1.7" },
+    { name = "djangorestframework", specifier = "==3.12.4" },
+    { name = "djangorestframework", marker = "extra == 'common'", specifier = "==3.12.4" },
+    { name = "idna", marker = "extra == 'api'", specifier = "==2.10" },
+    { name = "idna", marker = "extra == 'stock'", specifier = "==2.10" },
+    { name = "pytz", specifier = "==2021.1" },
+    { name = "pytz", marker = "extra == 'common'", specifier = "==2021.1" },
+    { name = "requests", marker = "extra == 'api'", specifier = "==2.25.1" },
+    { name = "requests", marker = "extra == 'stock'", specifier = "==2.25.1" },
+    { name = "sqlparse", specifier = "==0.4.1" },
+    { name = "sqlparse", marker = "extra == 'common'", specifier = "==0.4.1" },
+    { name = "urllib3", marker = "extra == 'api'", specifier = "==1.26.4" },
+    { name = "urllib3", marker = "extra == 'stock'", specifier = "==1.26.4" },
+]
+provides-extras = ["common", "api", "stock"]
+
+[[package]]
+name = "djangorestframework"
+version = "3.12.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cb/2e/86d38af19dcacccb53feda081cb5f4d6954480bfca961bc4dee31501bc99/djangorestframework-3.12.4.tar.gz", hash = "sha256:f747949a8ddac876e879190df194b925c177cdeb725a099db1460872f7c0a7f2", size = 825004 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/fe/18d96db43d440654e01a5831accd02948d373c160082bef186d6dc926255/djangorestframework-3.12.4-py3-none-any.whl", hash = "sha256:6d1d59f623a5ad0509fe0d6bfe93cbdfe17b8116ebc8eda86d45f6e16e819aaf", size = 957734 },
+]
+
+[[package]]
+name = "idna"
+version = "2.10"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/b7/e0e3c1c467636186c39925827be42f16fee389dc404ac29e930e9136be70/idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6", size = 175616 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a2/38/928ddce2273eaa564f6f50de919327bf3a00f091b5baba8dfa9460f3a8a8/idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0", size = 58811 },
+]
+
+[[package]]
+name = "pytz"
+version = "2021.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/61/eddc6eb2c682ea6fd97a7e1018a6294be80dba08fa28e7a3570148b4612d/pytz-2021.1.tar.gz", hash = "sha256:83a4a90894bf38e243cf052c8b58f381bfe9a7a483f6a9cab140bc7f702ac4da", size = 317945 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/94/784178ca5dd892a98f113cdd923372024dc04b8d40abe77ca76b5fb90ca6/pytz-2021.1-py2.py3-none-any.whl", hash = "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798", size = 510782 },
+]
+
+[[package]]
+name = "requests"
+version = "2.25.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "chardet" },
+    { name = "idna" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6b/47/c14abc08432ab22dc18b9892252efaf005ab44066de871e72a38d6af464b/requests-2.25.1.tar.gz", hash = "sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804", size = 102161 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/c1/24814557f1d22c56d50280771a17307e6bf87b70727d975fd6b2ce6b014a/requests-2.25.1-py2.py3-none-any.whl", hash = "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e", size = 61216 },
+]
+
+[[package]]
+name = "sqlparse"
+version = "0.4.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/54/da10f9a0235681179144a5ca02147428f955745e9393f859dec8d0d05b41/sqlparse-0.4.1.tar.gz", hash = "sha256:0f91fd2e829c44362cbcfab3e9ae12e22badaa8a29ad5ff599f9ec109f0454e8", size = 67228 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/14/05/6e8eb62ca685b10e34051a80d7ea94b7137369d8c0be5c3b9d9b6e3f5dae/sqlparse-0.4.1-py3-none-any.whl", hash = "sha256:017cde379adbd6a1f15a61873f43e8274179378e95ef3fede90b5aa64d304ed0", size = 42220 },
+]
+
+[[package]]
+name = "urllib3"
+version = "1.26.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/cf/871177f1fc795c6c10787bc0e1f27bb6cf7b81dbde399fd35860472cecbc/urllib3-1.26.4.tar.gz", hash = "sha256:e7b021f7241115872f92f43c6508082facffbd1c048e3c6e2bb9c2a157e28937", size = 293008 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/09/c6/d3e3abe5b4f4f16cf0dfc9240ab7ce10c2baa0e268989a4e3ec19e90c84e/urllib3-1.26.4-py2.py3-none-any.whl", hash = "sha256:2f4da4594db7e1e110a944bb1b551fdf4e6c136ad42e4234131391e21eb5b0df", size = 153320 },
+]
