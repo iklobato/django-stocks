@@ -1,26 +1,15 @@
-# encoding: utf-8
-
+import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.environ.get('SECRET_KEY', 'b!+q)h#vk3lz+lep2@d5=t*m7$grwtkl_(k-f9bt@75k-=omn4')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'b!+q)h#vk3lz+lep2@d5=t*m7$grwtkl_(k-f9bt@75k-=omn4'
+APPEND_SLASH = True
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-APPEND_SLASH = False
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_celery_results',
     'api'
 ]
 
@@ -63,20 +53,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'api_service.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -93,10 +75,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -107,10 +85,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
 STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
@@ -118,3 +92,21 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
 }
+
+RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
+RABBITMQ_PORT = int(os.environ.get('RABBITMQ_PORT', 5672))
+RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'guest')
+RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'guest')
+RABBITMQ_STOCK_QUEUE = os.environ.get('RABBITMQ_STOCK_QUEUE', 'stock_queue')
+RABBITMQ_TIMEOUT = int(os.environ.get('RABBITMQ_TIMEOUT', 10))
+
+STOCK_SERVICE_URL = os.environ.get('STOCK_SERVICE_URL', 'http://localhost:8001')
+
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost//')
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE

@@ -1,29 +1,12 @@
-[tool.uv]
-# Python dependency groups
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
 
-[tool.uv.dependencies]
-# Core dependencies for both services
-django = "==3.1.7"
-asgiref = "==3.3.1"
-djangorestframework = "==3.12.4"
-pytz = "==2021.1"
-sqlparse = "==0.4.1"
-certifi = "==2020.12.5"
-chardet = "==4.0.0"
-idna = "==2.10"
-requests = "==2.25.1"
-urllib3 = "==1.26.4"
-setuptools = "*"  # Required for distutils compatibility
-
-[tool.uv.dev-dependencies]
-pytest = ">=7.0.0"
-pytest-django = ">=4.5.2"
-black = ">=23.0.0"
-isort = ">=5.12.0"
-flake8 = ">=6.0.0"
-
-# Define groups for specific services
-[tool.uv.group.api]
+[project]
+name = "django-challenge"
+version = "0.1.0"
+description = "Django Challenge with Stock API"
+requires-python = ">=3.8.1"
 dependencies = [
     "django==3.1.7",
     "asgiref==3.3.1",
@@ -38,25 +21,26 @@ dependencies = [
     "setuptools",
 ]
 
-[tool.uv.group.stock]
-dependencies = [
-    "django==3.1.7",
-    "asgiref==3.3.1",
-    "djangorestframework==3.12.4",
-    "pytz==2021.1",
-    "sqlparse==0.4.1",
-    "certifi==2020.12.5",
-    "chardet==4.0.0",
-    "idna==2.10",
-    "requests==2.25.1",
-    "urllib3==1.26.4",
-    "setuptools",
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-django>=4.5.2",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
 ]
 
+[tool.setuptools]
+packages = []
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.md"]
+
+# Code formatting tools configuration
 [tool.black]
 line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
+target-version = ["py38"]
+include = "\\.pyi?$"
 
 [tool.isort]
 profile = "black"

@@ -1,0 +1,59 @@
+### Stock Service API Endpoints
+### Use with REST Client extension in VS Code or JetBrains IDEs
+
+### Variables
+@baseUrl = http://localhost:8001
+
+### Get stock data with trailing slash and stock_code parameter
+GET {{baseUrl}}/stock/?stock_code=aapl.us
+Accept: application/json
+
+### Get stock data without trailing slash and stock_code parameter
+GET {{baseUrl}}/stock?stock_code=aapl.us
+Accept: application/json
+
+### Test various parameter names
+
+# Using 'q' parameter (compatible with API service)
+GET {{baseUrl}}/stock?q=aapl.us
+Accept: application/json
+
+# Using 'symbol' parameter (alternative name)
+GET {{baseUrl}}/stock?symbol=aapl.us
+Accept: application/json
+
+### Test various stock symbols
+
+# Microsoft
+GET {{baseUrl}}/stock?stock_code=msft.us
+Accept: application/json
+
+# Google
+GET {{baseUrl}}/stock?stock_code=goog.us
+Accept: application/json
+
+# Amazon
+GET {{baseUrl}}/stock?stock_code=amzn.us
+Accept: application/json
+
+# Tesla
+GET {{baseUrl}}/stock?stock_code=tsla.us
+Accept: application/json
+
+# Facebook/Meta
+GET {{baseUrl}}/stock?stock_code=meta.us
+Accept: application/json
+
+# Netflix
+GET {{baseUrl}}/stock?stock_code=nflx.us
+Accept: application/json
+
+### Error cases
+
+# Invalid stock symbol
+GET {{baseUrl}}/stock?stock_code=invalid
+Accept: application/json
+
+# Missing parameter (should return 400 Bad Request)
+GET {{baseUrl}}/stock
+Accept: application/json
