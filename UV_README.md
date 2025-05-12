@@ -21,39 +21,29 @@ uv venv
 ### Activate the Virtual Environment
 
 ```bash
-# On Unix/macOS
 source .venv/bin/activate
-
-# On Windows
-.venv\Scripts\activate
 ```
 
 ### Install Dependencies
 
 ```bash
-# Install all dependencies directly from requirements.txt
+# If requirements.txt exists
 uv pip install -r requirements.txt
 
-# Make sure setuptools is installed (needed for distutils)
-uv pip install setuptools
-
-# OR use uv sync to install from pyproject.toml
-uv sync
+# Or install core dependencies directly
+uv pip install django==3.1.7 djangorestframework==3.12.4 requests==2.25.1 setuptools
 ```
 
 ### Service-Specific Dependencies
 
-You can install service-specific dependencies using groups:
+The core dependencies are the same for both services, so explicit installation of service-specific dependencies is usually not necessary. However, if you need to add service-specific dependencies:
 
 ```bash
-# For API service
-uv pip install -G api
+# For both services
+uv pip install <dependency-name>
 
-# For Stock service
-uv pip install -G stock
-
-# For development tools
-uv pip install -G dev
+# Update requirements.txt for future installs
+uv pip freeze > requirements.txt
 ```
 
 ## Running the Services
@@ -63,13 +53,13 @@ After installing dependencies:
 ### API Service
 ```bash
 cd api_service
-python manage.py runserver
+uv run python manage.py runserver
 ```
 
 ### Stock Service
 ```bash
 cd stock_service
-python manage.py runserver 8001
+uv run python manage.py runserver 8001
 ```
 
 ## Development Workflow
@@ -77,15 +67,27 @@ python manage.py runserver 8001
 To add new dependencies:
 
 ```bash
-# Add a dependency
-uv pip install package_name
+# Using the Makefile (recommended)
+make add pkg=package_name
 
-# Update requirements.txt
+# Or manually
+uv pip install package_name
+uv pip freeze > requirements.txt
+```
+
+## Updating Dependencies
+
+To update dependencies to their latest versions:
+
+```bash
+# Update a specific package
+uv pip install --upgrade package_name
 uv pip freeze > requirements.txt
 
-# Update pyproject.toml groups manually
+# Update all packages based on requirements.txt
+uv pip install --upgrade -r requirements.txt
 ```
 
 ## Note on Package Management
 
-This project uses uv for dependency management but is NOT configured as a Python package. It contains two separate Django applications that share dependencies. The pyproject.toml file is used solely for dependency management with uv and development tool configuration.
+This project uses uv for faster and more reliable dependency installation. It contains two separate Django applications that share the same core dependencies. We use requirements.txt for simplicity while maintaining a standardized pyproject.toml for compatibility with modern Python tools.
