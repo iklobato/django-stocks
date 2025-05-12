@@ -1,13 +1,8 @@
-# enconding: utf-8
-
 from django.conf import settings
 from django.db import models
 
 
 class UserRequestHistory(models.Model):
-    """
-    Model to store the requests done by each user.
-    """
     date = models.DateTimeField()
     name = models.CharField(max_length=100)
     symbol = models.CharField(max_length=20)

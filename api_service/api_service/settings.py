@@ -1,29 +1,15 @@
-# encoding: utf-8
-
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'b!+q)h#vk3lz+lep2@d5=t*m7$grwtkl_(k-f9bt@75k-=omn4')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Allow both with and without trailing slashes
 APPEND_SLASH = True
 
-# Parse allowed hosts from environment variable
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,20 +52,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'api_service.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -96,10 +74,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -110,10 +84,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
 STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
@@ -122,13 +92,11 @@ REST_FRAMEWORK = {
     ),
 }
 
-# RabbitMQ Settings
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
 RABBITMQ_PORT = int(os.environ.get('RABBITMQ_PORT', 5672))
 RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'guest')
 RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'guest')
 RABBITMQ_STOCK_QUEUE = os.environ.get('RABBITMQ_STOCK_QUEUE', 'stock_queue')
-RABBITMQ_TIMEOUT = int(os.environ.get('RABBITMQ_TIMEOUT', 10))  # seconds
+RABBITMQ_TIMEOUT = int(os.environ.get('RABBITMQ_TIMEOUT', 10))
 
-# Stock Service URL for fallback
 STOCK_SERVICE_URL = os.environ.get('STOCK_SERVICE_URL', 'http://localhost:8001')
