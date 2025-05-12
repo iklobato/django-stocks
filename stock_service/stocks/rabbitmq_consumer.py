@@ -54,7 +54,8 @@ class RabbitMQConsumer:
     
     def on_request(self, ch, method, props, body):
         try:
-            request_data = loads(body)
+            # Fix decoding issue by decoding the body to utf-8 first
+            request_data = loads(body.decode('utf-8'))
             logger.info(f"Received stock request: {request_data}")
             
             stock_code = (request_data.get('stock_code') or 
@@ -66,14 +67,17 @@ class RabbitMQConsumer:
                     "error": "Stock code is required (use 'stock_code', 'symbol', or 'q' parameter)",
                     "status": 400
                 }
-                self.send_response(ch, props, error_response)
-                ch.basic_ack(delivery_tag=method.delivery_tag)
+                response_sent = self.send_response(ch, props, error_response)
+                # Only acknowledge if the response was sent successfully
+                if response_sent:
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
                 return
             
             try:
                 url = f"https://stooq.com/q/l/?s={stock_code}&f=sd2t2ohlcvn&h&e=csv"
                 logger.info(f"Making request to: {url}")
-                response = requests.get(url)
+                # Add timeout to prevent hanging
+                response = requests.get(url, timeout=10)
                 response.raise_for_status()
                 
                 content = response.content.decode('utf-8')
@@ -88,8 +92,9 @@ class RabbitMQConsumer:
                         "error": "Invalid data received from stock API. Empty result.",
                         "status": 500
                     }
-                    self.send_response(ch, props, error_response)
-                    ch.basic_ack(delivery_tag=method.delivery_tag)
+                    response_sent = self.send_response(ch, props, error_response)
+                    if response_sent:
+                        ch.basic_ack(delivery_tag=method.delivery_tag)
                     return
                 
                 stock_data = dict(zip(header, data))
@@ -100,67 +105,87 @@ class RabbitMQConsumer:
                         "error": "No data available for this stock code",
                         "status": 404
                     }
-                    self.send_response(ch, props, error_response)
-                    ch.basic_ack(delivery_tag=method.delivery_tag)
+                    response_sent = self.send_response(ch, props, error_response)
+                    if response_sent:
+                        ch.basic_ack(delivery_tag=method.delivery_tag)
                     return
                 
                 try:
+                    # Guard against empty strings when casting numeric values
                     result = {
                         "symbol": stock_data.get('Symbol', '').upper(),
                         "name": stock_data.get('Name', '').upper() or stock_data.get('Symbol', '').upper(),
-                        "open": float(stock_data.get('Open', 0)),
-                        "high": float(stock_data.get('High', 0)),
-                        "low": float(stock_data.get('Low', 0)),
-                        "close": float(stock_data.get('Close', 0)),
-                        "volume": int(stock_data.get('Volume', 0))
+                        "open": float(stock_data.get('Open') or 0),
+                        "high": float(stock_data.get('High') or 0),
+                        "low": float(stock_data.get('Low') or 0),
+                        "close": float(stock_data.get('Close') or 0),
+                        "volume": int(stock_data.get('Volume') or 0)
                     }
-                    self.send_response(ch, props, result)
+                    response_sent = self.send_response(ch, props, result)
+                    if response_sent:
+                        ch.basic_ack(delivery_tag=method.delivery_tag)
                 except ValueError as e:
                     logger.error(f"Error converting values: {e}")
                     error_response = {
                         "error": f"Error converting data values: {str(e)}",
                         "status": 500
                     }
-                    self.send_response(ch, props, error_response)
+                    response_sent = self.send_response(ch, props, error_response)
+                    if response_sent:
+                        ch.basic_ack(delivery_tag=method.delivery_tag)
             except requests.RequestException as e:
                 logger.error(f"Request error: {e}")
                 error_response = {
                     "error": f"Failed to fetch stock data: {str(e)}",
                     "status": 500
                 }
-                self.send_response(ch, props, error_response)
+                response_sent = self.send_response(ch, props, error_response)
+                if response_sent:
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
             except (ValueError, TypeError, IndexError) as e:
                 logger.error(f"Data processing error: {e}")
                 error_response = {
                     "error": f"Error processing stock data: {str(e)}",
                     "status": 500
                 }
-                self.send_response(ch, props, error_response)
-            
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+                response_sent = self.send_response(ch, props, error_response)
+                if response_sent:
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
             
         except Exception as e:
             logger.error(f"Error processing request: {str(e)}")
-            ch.basic_ack(delivery_tag=method.delivery_tag)
             try:
                 error_response = {"error": str(e), "status": 500}
-                self.send_response(ch, props, error_response)
+                response_sent = self.send_response(ch, props, error_response)
+                if response_sent:
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
+                else:
+                    # If we can't send a response, still ack to avoid infinite retry
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
             except:
                 logger.error("Failed to send error response")
+                # Still ack the message to prevent it from being redelivered
+                ch.basic_ack(delivery_tag=method.delivery_tag)
     
     def send_response(self, ch, props, response_data):
         if props.reply_to:
-            ch.basic_publish(
-                exchange='',
-                routing_key=props.reply_to,
-                properties=pika.BasicProperties(
-                    correlation_id=props.correlation_id
-                ),
-                body=dumps(response_data)
-            )
-            logger.info(f"Sent response for correlation ID: {props.correlation_id}")
+            try:
+                ch.basic_publish(
+                    exchange='',
+                    routing_key=props.reply_to,
+                    properties=pika.BasicProperties(
+                        correlation_id=props.correlation_id
+                    ),
+                    body=dumps(response_data)
+                )
+                logger.info(f"Sent response for correlation ID: {props.correlation_id}")
+                return True
+            except Exception as e:
+                logger.error(f"Error sending response: {str(e)}")
+                return False
         else:
             logger.warning("No reply_to queue specified, cannot send response")
+            return False
     
     def run(self):
         if self.is_running:

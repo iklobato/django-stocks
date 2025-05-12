@@ -27,5 +27,9 @@ COPY ./stock_service/ /app/
 # Expose port
 EXPOSE 8001
 
-# Use gunicorn directly instead of entrypoint script for simplicity
-CMD ["gunicorn", "stock_service.wsgi:application", "--bind", "0.0.0.0:8001", "--workers", "2"]
+# Add Docker health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:8001/health/ || exit 1
+
+# Use entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]

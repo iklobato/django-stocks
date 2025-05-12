@@ -1,5 +1,5 @@
-### API Service Endpoints
-### Use with REST Client extension in VS Code or JetBrains IDEs
+# API Service Endpoints
+# Use with REST Client extension in VS Code or JetBrains IDEs
 
 ### Variables
 @baseUrl = http://localhost:8000
@@ -22,8 +22,9 @@ Accept: application/json
 
 ### Basic authentication credentials
 # @name basicAuth
-@base64Auth = {{username}}:{{password}}
-@adminBase64Auth = {{adminUsername}}:{{adminPassword}}
+# Using $base64Encode helper function to properly encode credentials
+@base64Auth = {{$base64Encode "{{username}}:{{password}}"}}
+@adminBase64Auth = {{$base64Encode "{{adminUsername}}:{{adminPassword}}"}}
 
 #################################
 ### STOCK DATA ENDPOINTS ########
