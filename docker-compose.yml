@@ -23,18 +23,26 @@ services:
     networks:
       - stock-network
 
-  # Stock Service
+  # Stock Service (RabbitMQ Consumer)
   stock-service:
     build:
       context: .
       dockerfile: ./stock_service/Dockerfile
     container_name: stock-service
     restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${SECRET_KEY}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_STOCK_QUEUE=${RABBITMQ_STOCK_QUEUE}
       - ALLOWED_HOSTS=localhost,127.0.0.1,stock-service
     ports:
       - "8001:8001"
@@ -49,41 +57,7 @@ services:
     networks:
       - stock-network
 
-  # RabbitMQ Service
-  rabbitmq-service:
-    build:
-      context: ./rabbitmq_service
-      dockerfile: Dockerfile
-    container_name: rabbitmq-service
-    restart: unless-stopped
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      stock-service:
-        condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      - RABBITMQ_HOST=${RABBITMQ_HOST}
-      - RABBITMQ_PORT=${RABBITMQ_PORT}
-      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
-      - RABBITMQ_STOCK_QUEUE=${RABBITMQ_STOCK_QUEUE}
-      - STOCK_SERVICE_URL=${STOCK_SERVICE_URL}
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    volumes:
-      - ./rabbitmq_service:/app
-    networks:
-      - stock-network
-
-  # API Service
+  # API Service (RabbitMQ Producer)
   api-service:
     build:
       context: .
@@ -93,7 +67,7 @@ services:
     depends_on:
       stock-service:
         condition: service_healthy
-      rabbitmq-service:
+      rabbitmq:
         condition: service_healthy
     env_file:
       - .env

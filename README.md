@@ -69,21 +69,20 @@ For simplicity, both services will share the same dependencies (requirements.txt
 ## Architecture
 ![Architecture Diagram](diagram.svg)
 1. A user makes a request asking for Apple's current Stock quote: `GET /stock?q=aapl.us`
-2. The API service sends a message to the RabbitMQ Service to retrieve the requested stock information
-3. The RabbitMQ Service forwards the request to the Stock Service
-4. The Stock Service calls the external API (stooq.com), parses the response, and returns the information
-5. The RabbitMQ Service forwards the response back to the API Service
+2. The API service (producer) publishes a message to the RabbitMQ queue
+3. The Stock service (consumer) consumes the message from the queue
+4. The Stock service calls the external API (stooq.com), parses the response
+5. The Stock service sends the response back to the API service via the RabbitMQ queue
 6. The API service saves the response in the database and returns it to the user
 
-## Microservices Architecture
-The project is split into four microservices:
+## Clean Microservices Architecture
+The project is split into three microservices with clear separation of concerns:
 
-1. **API Service**: Handles user authentication and stock queries
-2. **RabbitMQ Service**: Manages message queue communication between services
-3. **Stock Service**: Fetches stock data from external API
-4. **RabbitMQ Broker**: Provides the message queue infrastructure
+1. **API Service (Producer)**: Handles user authentication, stock queries, and publishes messages to RabbitMQ
+2. **Stock Service (Consumer)**: Fetches stock data from external API in response to messages from RabbitMQ
+3. **RabbitMQ**: Message broker that facilitates communication between services
 
-Each service has its own responsibility and can be scaled independently.
+This is a classic producer-consumer pattern where the API service produces messages and the Stock service consumes them. Each service has its own responsibility and can be scaled independently.
 
 ## Implemented Bonuses
 * **RabbitMQ Integration**: The services communicate via RabbitMQ using the Remote Procedure Call (RPC) pattern.

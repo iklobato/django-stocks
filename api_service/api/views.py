@@ -36,9 +36,9 @@ class StockView(APIView):
         logger = logging.getLogger(__name__)
         
         # Get stock code from query parameters
-        stock_code = request.query_params.get('q')
+        stock_code = request.query_params.get('q') or request.query_params.get('symbol')
         if not stock_code:
-            return Response({"error": "Stock code is required. Use 'q' parameter."}, status=400)
+            return Response({"error": "Stock code is required. Use 'q' or 'symbol' parameter."}, status=400)
         
         # Call the stock service via RabbitMQ
         try:
@@ -48,14 +48,13 @@ class StockView(APIView):
             
             # Prepare the request data
             request_data = {
-                'stock_code': stock_code,
-                'action': 'get_stock_data'
+                'stock_code': stock_code
             }
             
             logger.info(f"Sending RabbitMQ request for stock: {stock_code}")
             
             # Make the RPC call
-            response_data = rabbitmq_client.call(queue_name, request_data)
+            response_data = rabbitmq_client.call(queue_name, request_data, timeout=settings.RABBITMQ_TIMEOUT)
             
             # Check if we got a response
             if response_data is None:
@@ -63,7 +62,7 @@ class StockView(APIView):
                 return self.fallback_http_request(stock_code)
             
             # Check if there was an error
-            if 'error' in response_data:
+            if isinstance(response_data, dict) and 'error' in response_data:
                 error_message = response_data.get('error', 'Unknown error')
                 error_status = response_data.get('status', 500)
                 return Response({"error": error_message}, status=error_status)
@@ -88,13 +87,18 @@ class StockView(APIView):
         """Fallback method to call the stock service directly via HTTP"""
         import requests
         import logging
+        from django.conf import settings
         
         logger = logging.getLogger(__name__)
         logger.warning(f"Using HTTP fallback for stock: {stock_code}")
         
         try:
-            stock_service_url = "http://localhost:8001/stock"
-            response = requests.get(f"{stock_service_url}?stock_code={stock_code}")
+            # Use the configured stock service URL from settings
+            stock_service_url = getattr(settings, 'STOCK_SERVICE_URL', 'http://localhost:8001')
+            request_url = f"{stock_service_url}/stock?symbol={stock_code}"
+            
+            logger.info(f"Making fallback HTTP request to: {request_url}")
+            response = requests.get(request_url)
             
             # Log response for debugging
             logger.info(f"HTTP fallback response: {response.status_code}")

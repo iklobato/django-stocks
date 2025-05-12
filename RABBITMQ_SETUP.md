@@ -4,30 +4,28 @@ This document explains the RabbitMQ architecture in the Django Challenge project
 
 ## Overview
 
-The project uses a true microservices architecture with four separate services:
+The project uses a clean producer-consumer pattern with RabbitMQ as the message broker:
 
-1. **API Service**: Handles API requests from users, authenticates them, and manages the database
-2. **Stock Service**: Fetches stock data from the external stooq.com API
-3. **RabbitMQ Service**: Handles message queue communication between services
-4. **RabbitMQ Broker**: The actual RabbitMQ message broker
+1. **API Service (Producer)**: Produces messages with stock query requests
+2. **Stock Service (Consumer)**: Consumes messages and processes stock queries
+3. **RabbitMQ Broker**: Facilitates message passing between services
 
 ## Architecture
 
 The communication flow works as follows:
 
-1. API Service receives a stock query request from a user
-2. API Service sends a message to the RabbitMQ Service with the stock code
-3. RabbitMQ Service receives the message and forwards it to the Stock Service
+1. API Service (Producer) receives a stock query request from a user
+2. API Service creates a message with the stock code and publishes it to RabbitMQ
+3. Stock Service (Consumer) consumes the message from RabbitMQ
 4. Stock Service fetches the data from stooq.com API
-5. Stock Service sends the response back to the RabbitMQ Service
-6. RabbitMQ Service forwards the response back to the API Service
-7. API Service saves the data and returns it to the user
+5. Stock Service sends the response back to API Service through RabbitMQ
+6. API Service receives the response, saves it to the database, and returns it to the user
 
 This approach provides several benefits:
-- Better separation of concerns
-- Services can be scaled independently
+- Decoupled services that can evolve independently
+- Asynchronous communication for better scalability
+- Built-in message queuing and retry mechanisms
 - Improved fault tolerance and resilience
-- Each service has a single responsibility
 
 ## Running the Services
 
@@ -37,21 +35,32 @@ The easiest way to run all services is with Docker Compose:
 docker-compose up -d
 ```
 
-This will start all four services:
+This will start all three services:
 - RabbitMQ Broker on ports 5672 (AMQP) and 15672 (Management UI)
-- RabbitMQ Service on port 8080
-- Stock Service on port 8001
-- API Service on port 8000
+- Stock Service (Consumer) on port 8001
+- API Service (Producer) on port 8000
 
-## RabbitMQ Service
+## RabbitMQ Implementation
 
-The RabbitMQ Service is a standalone microservice written in Python using Flask:
+### API Service (Producer)
 
-- It connects to the RabbitMQ Broker and listens for messages
-- It forwards requests to the Stock Service via HTTP
-- It sends responses back to the API Service via RabbitMQ
-- It uses the Remote Procedure Call (RPC) pattern with correlation IDs
-- It provides fault tolerance and error handling
+The API Service acts as a RabbitMQ producer:
+
+- Uses the RPC (Remote Procedure Call) pattern for request-response communication
+- Creates a unique correlation ID for each request
+- Publishes messages to a durable queue
+- Listens for responses on a temporary callback queue
+- Includes a fallback HTTP mechanism if RabbitMQ communication fails
+
+### Stock Service (Consumer)
+
+The Stock Service acts as a RabbitMQ consumer:
+
+- Listens for messages on the stock queue
+- Processes stock requests by fetching data from the external API
+- Sends responses back to the API service using the reply_to queue
+- Uses the correlation ID to match responses with requests
+- Automatically reconnects if the connection to RabbitMQ is lost
 
 ## Configuration
 
