@@ -52,6 +52,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    command: >
+      bash -c "python manage.py migrate &&
+              gunicorn stock_service.wsgi:application --bind 0.0.0.0:8001 --workers 2"
     volumes:
       - ./stock_service:/app
     networks:
@@ -93,6 +96,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    command: >
+      bash -c "python manage.py migrate &&
+              python manage.py shell -c \"from django.contrib.auth.models import User; User.objects.filter(username='${ADMIN_USERNAME}').exists() or User.objects.create_superuser('${ADMIN_USERNAME}', '${ADMIN_EMAIL}', '${ADMIN_PASSWORD}')\" &&
+              gunicorn api_service.wsgi:application --bind 0.0.0.0:8000 --workers 2"
     volumes:
       - ./api_service:/app
     networks:

@@ -17,15 +17,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY ./stock_service/ /app/
-
-# Copy entrypoint script
+# Copy entrypoint script first and set permissions
 COPY ./stock_service/entrypoint.sh /app/
 RUN chmod +x /app/entrypoint.sh
+
+# Copy project
+COPY ./stock_service/ /app/
 
 # Expose port
 EXPOSE 8001
 
-# Use entrypoint script
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Use gunicorn directly instead of entrypoint script for simplicity
+CMD ["gunicorn", "stock_service.wsgi:application", "--bind", "0.0.0.0:8001", "--workers", "2"]

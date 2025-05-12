@@ -17,15 +17,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY ./api_service/ /app/
-
-# Copy entrypoint script
+# Copy entrypoint script first and set permissions
 COPY ./api_service/entrypoint.sh /app/
 RUN chmod +x /app/entrypoint.sh
+
+# Copy project
+COPY ./api_service/ /app/
 
 # Expose port
 EXPOSE 8000
 
-# Use entrypoint script
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Use gunicorn directly instead of entrypoint script for simplicity
+CMD ["gunicorn", "api_service.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
